@@ -60,26 +60,96 @@ col3.metric("High impact breaches",
 # Natural language query (simple version)
 st.subheader("💬 Ask a question")
 
+st.markdown("""
+### Example questions
+
+- Show critical incidents that exceeded recovery objectives
+- Show critical incidents that exceeded recovery objectives in Payments
+- Show medium impact incidents
+- Show Banking incidents
+- Show RTO breaches
+""")
+
 question = st.text_input(
     "Example: 'Show high impact incidents that breached RTO'"
 )
 
 def simple_query(df, question):
+
     q = question.lower()
 
     result = df.copy()
 
-    if "breach" in q:
+    # ---------------------------
+    # RTO breach synonyms
+    # ---------------------------
+    breach_terms = [
+        "breach",
+        "breached",
+        "exceeded",
+        "exceed",
+        "rto",
+        "recovery objective",
+        "recovery objectives",
+        "recovery target",
+        "recovery targets"
+    ]
+
+    if any(term in q for term in breach_terms):
         result = result[result["rto_breach"]]
 
-    if "high" in q:
+    # ---------------------------
+    # High impact synonyms
+    # ---------------------------
+    high_terms = [
+        "critical",
+        "high",
+        "severe",
+        "major"
+    ]
+
+    if any(term in q for term in high_terms):
         result = result[result["impact"] == "High"]
 
-    if "medium" in q:
+    # ---------------------------
+    # Medium impact synonyms
+    # ---------------------------
+    medium_terms = [
+        "medium",
+        "moderate"
+    ]
+
+    if any(term in q for term in medium_terms):
         result = result[result["impact"] == "Medium"]
 
-    if "low" in q:
+    # ---------------------------
+    # Low impact synonyms
+    # ---------------------------
+    low_terms = [
+        "low",
+        "minor"
+    ]
+
+    if any(term in q for term in low_terms):
         result = result[result["impact"] == "Low"]
+
+    # ---------------------------
+    # Service recognition
+    # ---------------------------
+    for service in df["service"].unique():
+
+        service_name = str(service).lower()
+
+        if service_name in q:
+            result = result[result["service"] == service]
+
+    # ---------------------------
+    # Sort by duration descending
+    # ---------------------------
+    result = result.sort_values(
+        by="duration_hours",
+        ascending=False
+    )
 
     return result
 
@@ -91,21 +161,29 @@ if question:
 
     # Explanation layer (no external API needed)
     if len(result) > 0:
-        st.write("### 🧠 Explanation")
+       st.write("### 🧠 Explanation")
 
-        explanation = f"""
-        Found {len(result)} incidents matching your query.
+if len(result) > 0:
 
-        Key observations:
-        - {result['impact'].value_counts().to_dict()}
-        - Average duration: {round(result['duration_hours'].mean(),2)} hours
-        - RTO breaches: {result['rto_breach'].sum()}
+    longest = result.iloc[0]
 
-        These incidents are considered critical because they exceed defined recovery objectives
-        and impact important business services.
-        """
+    explanation = f"""
+Found {len(result)} matching incidents.
 
-        st.info(explanation)
+The most severe incident was {longest['incident_id']} ({longest['title']}),
+which lasted {round(longest['duration_hours'],2)} hours.
+
+Average duration:
+{round(result['duration_hours'].mean(),2)} hours.
+
+Number of RTO breaches:
+{result['rto_breach'].sum()}.
+
+Services impacted:
+{', '.join(result['service'].unique())}.
+"""
+
+    st.info(explanation)
 
 # Footer
 st.markdown("---")
