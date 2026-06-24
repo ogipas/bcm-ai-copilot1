@@ -154,20 +154,20 @@ def simple_query(df, question):
     return result
 
 if question:
+
     result = simple_query(df, question)
 
     st.write("### Results")
     st.dataframe(result, use_container_width=True)
 
-    # Explanation layer (no external API needed)
+    # Explanation section
+    st.write("### 🧠 Explanation")
+
     if len(result) > 0:
-       st.write("### 🧠 Explanation")
 
-if len(result) > 0:
+        longest = result.iloc[0]
 
-    longest = result.iloc[0]
-
-    explanation = f"""
+        explanation = f"""
 Found {len(result)} matching incidents.
 
 The most severe incident was {longest['incident_id']} ({longest['title']}),
@@ -183,7 +183,7 @@ Services impacted:
 {', '.join(result['service'].unique())}.
 """
 
-    st.info(explanation)
+        st.info(explanation)
 
 # Footer
 st.markdown("---")
