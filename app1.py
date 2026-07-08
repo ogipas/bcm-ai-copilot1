@@ -6,7 +6,7 @@ from PIL import Image
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_PATH = BASE_DIR / "incidents.csv"
-IMAGE_PATH = BASE_DIR / "architecture.png"
+IMAGE_PATH = BASE_DIR / "images/architecture.png"
 
 st.set_page_config(page_title="Operational Resilience AI Prototype", layout="wide")
 
