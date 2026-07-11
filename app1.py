@@ -65,13 +65,13 @@ st.sidebar.title("🛡️ Operational Resilience AI")
 st.sidebar.info("""
 **Prototype Status**
 
-✅ Incident Analytics
+✅ Version 1 - Natural-language Incident Analysis
 
-✅ AI-generated Assessments
+✅ Version 2 - AI-generated Resilience Assessments
 
-🚧 RAG (planned)
+🚧 Version 3 - Retrieval-Augmented Generation (RAG) (planned)
 
-🚧 AI Agent (planned)
+🚧 Version 4 - AI Agent (planned)
 """)
 
 with st.sidebar.expander("🏗️ Architecture"):
